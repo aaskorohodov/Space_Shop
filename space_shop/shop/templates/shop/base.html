@@ -38,9 +38,14 @@
 <!-- Sidebar слева -->
 	<td valign="top" class="left-chapters">
 	<ul id="leftchapters">
+
+		{% for c in cats %}
+			<li><a href="{{ c.get_absolute_url }}">{{c.name}}</a></li>
+		{% endfor %}
+
 		<li class="share">
 			<p>Наш канал</p>
-			<a class="share-yt" href="#" target="_blank" rel="nofollow"></a>
+			<a class="share-yt" href="https://www.youtube.com/c/KerbalSpaceProgramOfficial" target="_blank" rel="nofollow"></a>
 		</li>
 	</ul>
 </td>

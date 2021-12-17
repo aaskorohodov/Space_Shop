@@ -1,0 +1,29 @@
+
+
+.popup:not(:target) {
+  display: none;
+}
+
+.popup:target {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(0,0,0,0.9);
+}
+.full-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 30px;
+  text-decoration: none;
+  color: red;
+}

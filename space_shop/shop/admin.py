@@ -25,5 +25,12 @@ class ProductAdmin(admin.ModelAdmin):
 class PropertyAdmin(admin.ModelAdmin):
     inlines = [ValueInline,]
 
+
+class CategoryAdmin(admin.ModelAdmin):
+    prepopulated_fields = {"slug": ("name",)}
+
+
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Property, PropertyAdmin)
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(ProductPhoto)
