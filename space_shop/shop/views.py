@@ -57,4 +57,8 @@ class ShowPost(DetailView):
         context = super().get_context_data(**kwargs)
         photos = ProductPhoto.objects.all()
         context['photos'] = photos
+
+        first_photo = photos[0]
+        context['first_photo'] = first_photo
+
         return context

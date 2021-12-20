@@ -16,7 +16,7 @@ a:hover {
 	text-decoration: underline;
 }
 
-img {max-width: 600px; height: auto;}
+img {width: 430px; height: auto; outline: 2px solid #000; border-radius: 10px;}
 
 img.img-article-left {
 	max-width: 300px;
@@ -436,6 +436,7 @@ ul.lang-list li a:hover {color: #fdc073;}
   border: 1px solid #CCC;
   border-radius: 15px;
   background: #eee;
+  margin-top: 15px;
 }
 
 .carousel img {
@@ -497,8 +498,6 @@ ul.lang-list li a:hover {color: #fdc073;}
 }
 
 
-
-
 .popup:not(:target) {
   display: none;
 }
@@ -534,4 +533,23 @@ ul.lang-list li a:hover {color: #fdc073;}
 #bigimg {
   width: 90%;
   height: 90%;
+}
+
+
+
+#container {
+  display: flex;
+}
+
+.specs {
+    display: flex;
+    justify-content: space-between;
+}
+
+.specs-container {
+    width: 180px;
+    margin-left: 20px;
+    background: #ebebeb;
+    padding: 5px;
+    border-radius: 10px;
 }
