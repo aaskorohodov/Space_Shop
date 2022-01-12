@@ -1,10 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'shop/base.html' %}
 
-</body>
-</html>
+{% block content %}
+
+<h2>{{ cat.name }}</h2>
+<div class="cat-description">
+	<img src="{{cat.cat_image.url}}" align="top" width="150px" class="cat-image">
+
+	<div><p>{{ cat.full_description|linebreaks }}</p></div>
+
+</div>
+
+<ul class="list-articles">
+	{% for p in posts %}
+		<li>
+			<div class="article-panel">
+         		<p class="first">Категория: {{p.cat}}</p>
+         		<p class="last">Цена: {{p.price}} ({{ p.currency }})</p>
+			</div>
+
+			<h2>{{p.title}}
+				<div class="inline" style="margin-left: 25px;">
+				{% for el in p.overall_rating %}
+
+					<div class="star-rating-small">★</div>
+
+				{% endfor %}
+				</div>
+			</h2>
+
+
+		{% if p.primary_photo %}
+			<p>
+				<div class="image-container">
+					<a href="{{ p.get_absolute_url }}">
+						<img class="img-article-left thumb" src="{{p.primary_photo.url}}">
+					</a>
+				</div>
+			</p>
+		{% endif %}
+
+			{{p.content|linebreaks|truncatewords:50}}
+			<div class="clear"></div>
+			<p class="link-read-post"><a href="{{ p.get_absolute_url }}">Посмотреть</a></p>
+			</li>
+	{% endfor %}
+</ul>
+
+{% endblock %}

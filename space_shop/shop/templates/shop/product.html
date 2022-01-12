@@ -1,0 +1,220 @@
+{% extends 'shop/base.html' %}
+ 
+{% block content %}
+ 
+<h1>{{post.title}}</h1>
+ 
+
+
+<div id="container">
+
+    <!--Рисуем основное фото. Оно кликабельно и разворачивает картинку в полный экран. Второй div id="full" скрыт-->
+    <div>
+        <a href="#full">
+            <img src="{{post.primary_photo.url}}">
+        </a>
+
+        <div id="full" class="popup">
+            <a href="#">
+                <img class="full-img" src="{{post.primary_photo.url}}">
+            </a>
+        </div>
+
+    </div>
+
+    <!--Второй div рисует область с характеристиками-->
+    <div class="specs-container">
+        {% for el in values %}
+            <div class="specs">
+                <div>{{ el.prop }}:</div>
+                <div>{{ el }}</div>
+            </div>
+        {% endfor %}
+        <div class="specs">
+            {% if rating %}
+                <div>Средняя оценка:</div>
+                <div>{{ rating }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!--Кнопка купить и окружающая область-->
+    <div class="basket-container">
+
+        <div class="product-price">{{post.price}} ({{post.currency}})</div>
+
+        <div>
+            <form class="inlines-form" action="{% url 'basket' post.id %}" method="post">
+                {% csrf_token %}
+                <button class="glow-button" type="submit">Купить</button>
+                <h5>Количество:</h5>
+                <input type="number" name="quantity" value="1" min="1" required="" id="id_quantity">
+            </form>
+        </div>
+
+        <div>Доступно на складе: {{post.quantity}}</div>
+
+
+    </div>
+
+</div>
+
+
+
+  <div id="carousel" class="carousel">
+    <button class="arrow prev">⇦</button>
+    <div class="gallery">
+      <ul>
+          {% for el in photos %}
+
+              <li><a href="#{{ el.photo }}"><img src="{{el.photo.url}}"></a></li>
+
+              <div id="{{ el.photo }}" class="popup">
+                <a href="#" class="close">X</a>
+                <img class="full-img" id="bigimg" src="{{el.photo.url}}">
+              </div>
+
+          {% endfor %}
+      </ul>
+    </div>
+    <button class="arrow next">⇨</button>
+  </div>
+
+
+
+
+
+
+  <script>
+    /* этот код помечает картинки, для удобства разработки */
+    let i = 1;
+    for(let li of carousel.querySelectorAll('li')) {
+      li.style.position = 'relative';
+      li.insertAdjacentHTML('beforeend', `<span style="position:absolute;left:0;top:0">${i}</span>`);
+      i++;
+    }
+
+    /* конфигурация */
+    let width = 130; // ширина картинки
+    let count = 1; // видимое количество изображений
+
+    let list = carousel.querySelector('ul');
+    let listElems = carousel.querySelectorAll('li');
+
+    let position = 0; // положение ленты прокрутки
+
+    carousel.querySelector('.prev').onclick = function() {
+      // сдвиг влево
+      position += width * count;
+      // последнее передвижение влево может быть не на 3, а на 2 или 1 элемент
+      position = Math.min(position, 0)
+      list.style.marginLeft = position + 'px';
+    };
+
+    carousel.querySelector('.next').onclick = function() {
+      // сдвиг вправо
+      position -= width * count;
+      // последнее передвижение вправо может быть не на 3, а на 2 или 1 элемент
+      position = Math.max(position, -width * (listElems.length - count));
+      list.style.marginLeft = position + 'px';
+    };
+  </script>
+
+ 
+{{post.content|linebreaks}}
+
+<div class="comment">
+<h3>Комментарии пользователей:</h3>
+
+    {% if comments %}
+        <ul>
+            {% for el in comments %}
+                <li>
+                    <div class="comment-exact">
+                        <div class="comment-body">
+                            <h4>Пользователь {{el.user}}:</h4>
+                            <p>{{el.text}}</p>
+
+                            {% if el.star_rating %}
+                            <hr>
+                            <div class="star-rating-head">Оценка:</div>
+                                {% for r in el.star_rating %}
+                                    <div class="star-rating">★</div>
+                                {% endfor %}
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+    {% else %}
+        <p>Нет комментариев</p>
+
+    {% endif %}
+
+
+
+    <form class="form-comment" action="" method="post">
+
+
+            <!-- csrf_token встроенная защита от копирования формы на другой ресурс -->
+            {% csrf_token %}
+
+            <div class="form-error">{{ form.non_field_errors }}</div>
+
+            <ul>
+                <li><h3>Добавить комментарий</h3></li>
+
+                {% for f in form %}
+                    {% if f.label == 'Пользователь' and request.user.is_authenticated %}
+                        <li>
+                            <label class="form-label" for="{{ f.id_for_label }}">{{f.label}}:
+                            <input type="text" name="user" placeholder="{{ user.username }}" id="id_user"> </label>
+                        </li>
+                        <div class="form-error">{{ f.errors }}</div>
+
+                    {% elif f.label == 'Rating' %}
+                        <li class="rating-li">
+                            <div class="inline">Ваша оценка:</div>
+                            <span class="rating-area">
+
+                                <input type="radio" name="rating" value="5" id="id_rating_5">
+                                <label for="id_rating_5"></label>
+
+                                <input type="radio" name="rating" value="4" id="id_rating_4">
+                                <label for="id_rating_4"></label>
+
+                                <input type="radio" name="rating" value="3" id="id_rating_3">
+                                <label for="id_rating_3"></label>
+
+                                <input type="radio" name="rating" value="2" id="id_rating_2">
+                                <label for="id_rating_2"></label>
+
+                                <input type="radio" name="rating" value="1" id="id_rating_1">
+                                <label for="id_rating_1"></label>
+
+                            </span>
+
+                        </li>
+
+                    {% else %}
+                        <li><label class="form-label" for="{{ f.id_for_label }}">{{f.label}}: </label>{{ f }}</li>
+                        <div class="form-error">{{ f.errors }}</div>
+
+                    {% endif %}
+                {% endfor %}
+                <li>
+                    <hr>
+                    <button type="submit">Добавить</button>
+                </li>
+            </ul>
+
+    </form>
+
+</div>
+
+{{visits}}
+
+{% endblock %}

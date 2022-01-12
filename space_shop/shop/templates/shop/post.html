@@ -86,4 +86,46 @@
 
  
 {{post.content|linebreaks}}
+
+<div class="comment">
+<h3>Комментарии пользователей:</h3>
+
+    {% if comments %}
+        <ul>
+            {% for el in comments %}
+                <li>
+                    <div class="comment-exact">
+                        <div class="comment-body">
+                            <h4>Пользователь {{el.user}}:</h4>
+                            <p>{{el.text}}</p>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+    {% else %}
+        <p>Нет комментариев</p>
+
+    {% endif %}
+
+<h3>Добавить комментарий</h3>
+
+    <form action="" method="post">
+        <!-- csrf_token встроенная защита от копирования формы на другой ресурс -->
+        {% csrf_token %}
+
+        <div class="form-error">{{ form.non_field_errors }}</div>
+
+        {% for f in form %}
+            <p><label class="form-label" for="{{ f.id_for_label }}">{{f.label}}: </label>{{ f }}</p>
+            <div class="form-error">{{ f.errors }}</div>
+        {% endfor %}
+
+        <button type="submit">Добавить</button>
+    </form>
+
+
+</div>
+
 {% endblock %}

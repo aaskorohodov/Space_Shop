@@ -22,12 +22,12 @@ img.img-article-left {
 	max-width: 300px;
 	height: auto;
 	float: left;
-	padding: 0 10px 10px 0;
+	padding: 0px;
+	margin-right: 16px;
 }
 
 img.img-article-left.thumb {
-	max-width: 150px;
-	height: auto;
+	max-width: 260px;
 }
 
 p.link-read-post {
@@ -444,6 +444,8 @@ ul.lang-list li a:hover {color: #fdc073;}
   height: 130px;
   /* делаем этот элемент блочным, чтобы убрать лишнее пространство вокруг картинок */
   display: block;
+  margin: 0px 5px 0px 5px;
+  outline: 0px;
 }
 
 .arrow {
@@ -518,8 +520,8 @@ ul.lang-list li a:hover {color: #fdc073;}
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 99999999;
-  width: 90%;
-  height: 90%;
+  height: 90vh;
+  width: auto;
 }
 .close {
   position: absolute;
@@ -531,7 +533,7 @@ ul.lang-list li a:hover {color: #fdc073;}
 }
 
 #bigimg {
-  width: 90%;
+  width: auto;
   height: 90%;
 }
 
@@ -547,9 +549,239 @@ ul.lang-list li a:hover {color: #fdc073;}
 }
 
 .specs-container {
-    width: 180px;
+    width: 370px;
     margin-left: 20px;
     background: #ebebeb;
     padding: 5px;
     border-radius: 10px;
+}
+
+.basket-container {
+    width: 370px;
+    margin-left: 20px;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.basket-container div {
+    margin-left: 20px;
+}
+
+.comment {
+    margin-top: 50px
+}
+
+.comment ul {
+    list-style: none;
+    padding: 0px;
+    width: 700px;
+}
+
+.comment p {
+    word-wrap: break-word;
+}
+
+.comment-exact {
+    outline: 2px solid #000;
+    border-radius: 10px;
+}
+
+.comment-body {
+    margin: 15px 15px;
+    padding: 3px;
+}
+
+
+.cat-image {
+    width: 250px;
+    margin-right: 20px;
+}
+
+.categories {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.categories div {
+  border: 1px solid lightgray;
+  border-radius: 10px;
+}
+
+.categories img {
+    display: block;
+    width: 250px;
+    height: 250px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 15px;
+}
+
+.categories p {
+    text-align: center;
+    font-size: 40pt;
+}
+
+.cat-title {
+    margin: 10px;
+}
+
+.form-comment {
+    border: 1px solid #CCC;
+    border-radius: 1em;
+    padding: 1em;
+    width: 444px;
+}
+
+
+.form-comment ul {
+    list-style: none;
+    padding: 0px;
+    width: 435px;
+}
+
+
+.form-comment textarea, input {
+    width: 300px;
+}
+
+.form-comment label {
+    display: inline;
+}
+
+
+.cat-description {
+    display: flex;
+    padding: 10px 0px 100px 0px;
+}
+
+.image-container {
+    overflow:hidden;
+    float: left;
+    max-height: 170px;
+    border-radius: 10px;
+}
+
+.image-container img {
+    outline: 0px;
+}
+
+.inline {
+    display: inline;
+}
+
+.inlines-form input {
+    display: inline;
+    width: 50px;
+}
+
+.inlines-form h5 {
+    display: inline;
+}
+
+
+.rating-li {
+    margin: 15px 0 15px 0;
+}
+
+.rating-area {
+	overflow: hidden;
+	width: 265px;
+	margin: 0 auto;
+}
+.rating-area:not(:checked) > input {
+	display: none;
+}
+.rating-area:not(:checked) > label {
+	float: right;
+	width: 42px;
+	padding: 0;
+	cursor: pointer;
+	font-size: 32px;
+	line-height: 32px;
+	color: lightgrey;
+	text-shadow: 1px 1px #bbb;
+}
+.rating-area:not(:checked) > label:before {
+	content: '★';
+}
+.rating-area > input:checked ~ label {
+	color: gold;
+	text-shadow: 1px 1px #c60;
+}
+.rating-area:not(:checked) > label:hover,
+.rating-area:not(:checked) > label:hover ~ label {
+	color: gold;
+}
+.rating-area > input:checked + label:hover,
+.rating-area > input:checked + label:hover ~ label,
+.rating-area > input:checked ~ label:hover,
+.rating-area > input:checked ~ label:hover ~ label,
+.rating-area > label:hover ~ input:checked ~ label {
+	color: gold;
+	text-shadow: 1px 1px goldenrod;
+}
+.rate-area > label:active {
+	position: relative;
+}
+
+.star-rating {
+    display: inline;
+    color: gold;
+}
+
+.star-rating-head {
+    display: inline;
+}
+
+.star-rating-small {
+    display: inline;
+    color: gold;
+    font-size: 22px;
+}
+
+.product-price {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.glow-button {
+ text-decoration: none;
+ outline: none;
+ display: inline-block;
+ color: white;
+ font-weight: bold;
+ letter-spacing: 2px;
+ font-family: 'Montserrat', sans-serif;
+ padding: 15px 30px;
+ margin: 10px 0px;
+ border-radius: 10px;
+ box-shadow: 0 0 40px 40px #F137A6 inset, 0 0 0 0 #F137A6;
+ transition: 150ms ease-in-out;
+ display: block;
+}
+
+.glow-button:hover {
+ box-shadow: 0 0 10px 0 #F137A6 inset, 0 0 10px 4px #F137A6;
+ color: #F137A6;
+}
+
+.basket_photo {
+    width: 400px;
+    outline: 0px;
+}
+
+.basket-list {
+    background: #ebebeb;
+    border-radius: 10px;
+}
+
+.basket-image-container {
+    overflow: hidden;
+    max-height: 350px;
+    max-width: 400px;
+    margin: 20px 0 20px 0;
+    outline: 2px solid #000;
+    border-radius: 10px;
+
 }
