@@ -98,21 +98,7 @@ class ShowProduct(CardMixin, FormMixin, DetailView):
             self.request.session['visits'] = 0
 
         self.request.session['visits'] = self.request.session['visits'] + 1
-        # self.request.session['cart']['test'] = 123
-        # print(self.request.session['cart']['test'])
-
         context['visits'] = self.request.session['visits']
-        # print(self.request.session['cart'])
-
-        # self.request.session['items'] = {'1': 1, '2': 2}
-        # self.readcart(self.request.session)
-
-        # try:
-        #     self.request.session['123']
-        # except:
-        #     self.request.session['123'] = 'item'
-        #
-        # context['session'] = self.request.session['123']
 
         photos = ProductPhoto.objects.filter(product__slug=self.kwargs['post_slug'])
         context['photos'] = photos
@@ -193,57 +179,83 @@ class ShowProduct(CardMixin, FormMixin, DetailView):
         return super().form_valid(form)
 
 
-class Basket(CreateView):
+class Basket(CardMixin, CreateView):
     template_name = 'shop/basket.html'
     form_class = MakeOrder
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # del self.request.session['cart']
-        # self.request.session['cart'] = {}
-        # print(self.request.session['cart'])
+        context = self.get_cats_for_left_menu(context)
+
+        # не передается продукт для добавления в корзину (переход в корзину по ссылке)
+        if 'prod' not in self.request.POST:
+            print('1')
+
+            # в сессии нет корзины или словарь пуст
+            if 'cart' not in self.request.session or not self.request.session['cart']:
+                print('2')
+
+            # словарь корзины в сессии имеет товары
+            else:
+                session_cart = self.request.session['cart']
+
+                # запрос на удаление товара
+                if 'del-item' in self.request.POST:
+                    try:
+                        del session_cart[self.request.POST['del-item']]
+                        self.request.session['cart'] = session_cart
+                        self.request.session.modified = True
+                        context = self.show_cart(context, session_cart)
+
+                    # на всякий случай
+                    except:
+                        self.show_cart(context, session_cart)
+
+                # запрос на изменение количества товара
+                elif 're-quantity' in self.request.POST:
+                    prod_id = self.request.POST['re-quantity-prod-id']
+                    new_quantity = self.request.POST['re-quantity']
+                    session_cart[str(prod_id)] = str(new_quantity)
+                    context = self.show_cart(context, session_cart)
+                    self.request.session['cart'] = session_cart
+                    self.request.session.modified = True
+
+                # запрос на просто показать карзину
+                else:
+                    print('3')
+                    context = self.show_cart(context, session_cart)
+
+        # был передан продукт для добавления
+        else:
+            print('4')
+            # корзина пуста
+            if 'cart' not in self.request.session or not self.request.session['cart']:
+                print('5')
+                context_cart, session_cart = self.make_cart(self.request.POST)
+                context['cart'] = context_cart
+
+            # в корзине что-то есть
+            else:
+                print('6')
+                context, session_cart = self.add_to_cart(context, self.request.session['cart'], self.request.POST)
+
+            # кладем корзину в сессию, принудительно сохраняем сессию, передаем контекст в шаблон
+            self.request.session['cart'] = session_cart
+            self.request.session.modified = True
 
         try:
-            cart = self.request.session['cart']
-            prod = str(self.kwargs['prod_id'])
-        except KeyError:
-            self.request.session['cart'] = {}
-            cart = self.request.session['cart']
-            prod = str(self.kwargs['prod_id'])
+            print('show_price try started')
+            context = self.show_price(context)
+            print('show_price try done')
+            return context
+        except:
+            print('show_price except happened')
+            return context
 
-
-        '''Проверяем, не лежит ли товар уже в сессии (в ключах словаря cart). Если уже лежит, то в значение плюсуем
-        текущее запрошенное количество товара. Т.е. у корзине лежит 5 союзов, заказали еще 5, стало 10.'''
-        if prod in cart.keys():
-            cart[prod] = cart[prod] + int(self.request.POST['quantity'])
-        else:
-            cart[prod] = int(self.request.POST['quantity'])
-
-        self.request.session['cart'] = cart
-        self.request.session.modified = True
-
-        print(self.request.session['cart'])
-
-        products = []
-        quantities = []
-        for prod, quant in cart.items():
-            products.append(prod)
-            quantities.append(quant)
-
-        cart_context = {}
-        counter = 0
-        for el in products:
-            product = Product.objects.filter(pk=int(el))
-            cart_context[product[0]] = quantities[counter]
-            counter += 1
-
-        context['cart'] = cart_context
-        print(context['cart'])
-
-        return context
-
-
+class MyOrders(DetailView):
+    model = Order
+    template_name = 'orders.html'
 
 class RegisterUser(CreateView):
     '''Регистрация нового пользователя'''

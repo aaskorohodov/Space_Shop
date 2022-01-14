@@ -9,7 +9,9 @@ urlpatterns = [
     path('test', test, name='test'),
     path('test2', test2, name='test2'),
     path('cat/<slug:cat_slug>/<slug:post_slug>/', ShowProduct.as_view(), name='product'),
-    path('basket/<int:prod_id>/', Basket.as_view(), name='basket')
+    path('basket', Basket.as_view(), name='basket'),
+    path('basket/<int:someint>', Basket.as_view(), name='basket'),
+    path('orders/', MyOrders.as_view(), name='orders')
 ]
 
 

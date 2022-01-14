@@ -71,9 +71,14 @@ class Order(models.Model):
     first_name = models.CharField(max_length=255, unique=False, null=True, blank=True, verbose_name='Имя')
     last_name = models.CharField(max_length=255, unique=False, null=True, blank=True, verbose_name='Фамилия')
     email = models.EmailField()
+    planet = models.CharField(max_length=255, unique=False, null=True, blank=True, verbose_name='Планета (для доставки)')
     city = models.CharField(max_length=255, unique=False, null=True, blank=True, verbose_name='Город')
     address = models.CharField(max_length=255, unique=False, null=True, blank=True, verbose_name='Адрес')
     paid = models.BooleanField(default=False, verbose_name='оплата')
+    delivery = models.BooleanField(default=False, verbose_name='Требуется доставка')
+
+    def get_absolute_url(self):
+        return reverse('orders')
 
 
 class ItemsOrdered(models.Model):

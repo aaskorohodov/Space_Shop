@@ -44,11 +44,13 @@
         <div class="product-price">{{post.price}} ({{post.currency}})</div>
 
         <div>
-            <form class="inlines-form" action="{% url 'basket' post.id %}" method="post">
+            <form class="inlines-form" action="{% url 'basket' %}" method="post">
                 {% csrf_token %}
                 <button class="glow-button" type="submit">Купить</button>
                 <h5>Количество:</h5>
-                <input type="number" name="quantity" value="1" min="1" required="" id="id_quantity">
+                <input type="number" name="quantity" value="1" min="1" max="{{post.quantity}}" required="" id="id_quantity">
+                <!--следующий инпут передает корзине номер товара-->
+                <input type="hidden" name="prod" value="{{post.id}}" required="">
             </form>
         </div>
 
