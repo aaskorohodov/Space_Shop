@@ -1,0 +1,35 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+
+{% if activ_orders %}
+    <div>Мои заказы:</div>
+
+    <ul>
+        {% for order in activ_orders %}
+            <li>
+                <div>
+                    <a href="{{ order.get_absolute_url }}">{{order.pk}}</a>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+
+{% if closed_orders %}
+
+    <div>Закртытые заказы:</div>
+
+    <ul>
+        {% for order in closed_orders %}
+            <li>
+                <div>
+                    <a href="{{ order.get_absolute_url }}">{{order.pk}}</a>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% endblock %}

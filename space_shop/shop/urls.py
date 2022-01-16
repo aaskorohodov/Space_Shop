@@ -11,7 +11,8 @@ urlpatterns = [
     path('cat/<slug:cat_slug>/<slug:post_slug>/', ShowProduct.as_view(), name='product'),
     path('basket', Basket.as_view(), name='basket'),
     path('basket/<int:someint>', Basket.as_view(), name='basket'),
-    path('orders/', MyOrders.as_view(), name='orders')
+    path('account/<slug:name>/', Account.as_view(), name='account'),
+    path('account/<slug:name>/order<int:pk>', MyOrder.as_view(), name='orders')
 ]
 
 

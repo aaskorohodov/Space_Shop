@@ -76,9 +76,14 @@ class Order(models.Model):
     address = models.CharField(max_length=255, unique=False, null=True, blank=True, verbose_name='Адрес')
     paid = models.BooleanField(default=False, verbose_name='оплата')
     delivery = models.BooleanField(default=False, verbose_name='Требуется доставка')
+    closed = models.BooleanField(default=False, verbose_name='Заказ закрыт')
 
     def get_absolute_url(self):
-        return reverse('orders')
+        return reverse('orders', kwargs={'name': self.user, 'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        print('asdasdddddd')
+        super(Order, self).save(*args, **kwargs)
 
 
 class ItemsOrdered(models.Model):

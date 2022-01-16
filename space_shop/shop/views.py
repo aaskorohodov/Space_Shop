@@ -79,7 +79,8 @@ class ShowProduct(CardMixin, FormMixin, DetailView):
     context_object_name = 'post'
 
     def get_object(self, *args, **kwargs):
-        '''Нужен, так как в урле используется два слага (категория + товар). Ниже мы пытаемся найти товар по его слагу,
+        '''get_object отличается от get_queryset тем, что возвращает конкретный объект, а не набор объектов.
+        Нужен, так как в урле используется два слага (категория + товар). Ниже мы пытаемся найти товар по его слагу,
         а вторым запросом просто проверяем, существует ли категория, равная второму слагу. Если не указать второй запрос,
         то можно будет в урл вбить любую биллиберду вместо категории, но при правильно указанном товаре, получим страницу.
         Например /asdasdasd/tovar1. А так не получим, будет 404, потому что по слагу asdasdasd нет категории.'''
@@ -253,9 +254,57 @@ class Basket(CardMixin, CreateView):
             print('show_price except happened')
             return context
 
-class MyOrders(DetailView):
+    def form_valid(self, form):
+
+        current_form = form.save(commit=False)
+        current_form.user = self.request.user.username
+        current_form.save()
+
+        return super().form_valid(form)
+
+
+class Account(TemplateView):
+    template_name = 'shop/account.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user_name = self.request.user
+        activ_orders = Order.objects.filter(user=user_name, closed=0)
+        closed_orders = Order.objects.filter(user=user_name, closed=1)
+        context['activ_orders'] = activ_orders
+        context['closed_orders'] = closed_orders
+
+        return context
+
+class MyOrder(DetailView):
     model = Order
-    template_name = 'orders.html'
+    template_name = 'shop/order.html'
+    context_object_name = 'order'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        self.save_items_clean_cart()
+
+        return context
+
+    def save_items_clean_cart(self):
+        if self.request.session['cart']:
+            print(self.request.session['cart'])
+            user_name = self.request.user
+
+            for prod, quant in self.request.session['cart'].items():
+                item = ItemsOrdered()
+                item.order = Order.objects.filter(user=user_name, closed=0).last()
+                product = Product.objects.filter(pk=int(prod))[0]
+                item.product = product
+                item.quantity = int(quant)
+                item.save()
+
+            del self.request.session['cart']
+
+
 
 class RegisterUser(CreateView):
     '''Регистрация нового пользователя'''
