@@ -833,3 +833,27 @@ ul.lang-list li a:hover {color: #fdc073;}
     width: 30px;
     height: 20px;
 }
+
+.orders td, th {
+    border: 1px solid rgb(190,190,190);
+    padding: 10px 20px;
+    text-align: center;
+}
+
+.orders {
+    border-collapse: collapse;
+}
+
+.order-exact {
+    border-collapse: collapse;
+}
+
+.order-exact td, th {
+    border: 1px solid rgb(190,190,190);
+    padding: 10px 20px;
+    text-align: center;
+}
+
+.order-exact img {
+    outline: 0px solid #000;
+}

@@ -3,17 +3,45 @@
 {% block content %}
 
 {% if activ_orders %}
-    <div>Мои заказы:</div>
+    <p>Мои заказы:</p>
 
-    <ul>
+    <table class="orders">
+
+    <!--Заголовок-->
+        <tr>
+            <th>Номер заказа</th>
+            <th>Статус</th>
+            <th>Время создания</th>
+            <th>Товары</th>
+        </tr>
+
+    <!--Строки заказов-->
         {% for order in activ_orders %}
-            <li>
-                <div>
-                    <a href="{{ order.get_absolute_url }}">{{order.pk}}</a>
-                </div>
-            </li>
+        <tr>
+            <td><a href="{{ order.get_absolute_url }}">{{order.pk}}</a></td>
+            <td>В работе</td>
+            <td>
+                {% if order.time_create %}
+                    {{order.time_create}}
+                {% else %}
+                    Время неизвестно
+                {% endif %}
+            </td>
+            <td>
+    <!--Проверяем, что товары есть, если есть, выводим title первого товара и количество других товаров в заказе,-->
+    <!--которое мы получим из view, где это уже посчитано и упаковано. Если в заказе всего 1 товар, то itemnumber-->
+    <!--будет пустым и мы ничего не отобразим.-->
+                {% if order.first != 'Нет товаров' %}
+                    <div><a href="{{ order.first.product.get_absolute_url }}">{{order.first.product.title}}</a></div>
+                    <div>{{order.itemnumber}}</div>
+                {% else %}
+                    {{order.first}}
+                {% endif %}
+            </td>
+        </tr>
         {% endfor %}
-    </ul>
+    </table>
+
 {% endif %}
 
 

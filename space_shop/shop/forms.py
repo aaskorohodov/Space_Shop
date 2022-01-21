@@ -41,4 +41,4 @@ class AddComment(forms.ModelForm):
 class MakeOrder(forms.ModelForm):
     class Meta:
         model = Order
-        exclude = ['paid', 'delivery', 'user']
+        exclude = ['paid', 'delivery', 'user', 'canceled', 'closed']

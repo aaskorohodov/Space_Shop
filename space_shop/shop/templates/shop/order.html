@@ -2,6 +2,28 @@
 
 {% block content %}
 
-{{order.pk}}
+<h2>Заказ {{order.pk}}</h2>
+
+<table class="order-exact">
+
+    <tr>
+        <th>Товар</th>
+        <th>Количество</th>
+    </tr>
+
+    {% for item in items %}
+    <tr>
+        <td><a href="{{ item.product.get_absolute_url }}"><img src="{{item.product.primary_photo.url}}"></a></td>
+        <td>{{item.quantity}}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<form action="{% url 'account' user.username %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="order-cancel" value="yes">
+    <input type="hidden" name="order-pk" value="{{order.pk}}">
+    <button class="glow-button" type="submit">Отменить этот заказ</button>
+</form>
 
 {% endblock %}

@@ -68,3 +68,33 @@ class CardMixin:
         cats = Category.objects.all()
         context['cats'] = cats
         return context
+
+    def save_items_clean_cart(self):
+        '''Создает записи в модель ItemsOrdered, то есть записывает, какие товары и в каком количестве были заказаны.
+        Также чистить корзину (удаляет словарь cart bз сессии). Если в сессии нет словаря cart, то ничего не делает.'''
+
+        if 'cart' in self.request.session:
+            user_name = self.request.user
+
+            for prod, quant in self.request.session['cart'].items():
+                item = ItemsOrdered()
+
+                item.order = Order.objects.filter(user=user_name, closed=0).last()
+                product = Product.objects.filter(pk=int(prod))[0]
+
+                item.product = product
+                item.quantity = int(quant)
+                item.save()
+
+            del self.request.session['cart']
+
+    def get_items_for_exact_order(self, order, context):
+        '''Добывает модель ItemsOrdered для конкретного заказа. Пакует в список, передает список в контекст.'''
+        items = ItemsOrdered.objects.filter(order=order.pk)
+        context_items = []
+
+        for item in items:
+            context_items.append(item)
+
+        context['items'] = context_items
+

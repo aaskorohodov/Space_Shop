@@ -184,7 +184,7 @@ class Basket(CardMixin, CreateView):
     template_name = 'shop/basket.html'
     form_class = MakeOrder
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         context = self.get_cats_for_left_menu(context)
@@ -269,40 +269,59 @@ class Account(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # Готовим открытые и закрытые заказы, на основе user_name
         user_name = self.request.user
         activ_orders = Order.objects.filter(user=user_name, closed=0)
         closed_orders = Order.objects.filter(user=user_name, closed=1)
         context['activ_orders'] = activ_orders
         context['closed_orders'] = closed_orders
 
+        # Готовим товары для заказов (это другая модель) и кладем в контекст
+        for order in context['activ_orders']:
+            items = ItemsOrdered.objects.filter(order=order.pk)
+
+            # try на случай, если нет товаров, чтобы обращение по индексу items[0] не вернуло ошибку
+            try:
+                order.first = items[0]
+                # считаем количество товаров, чтобы показать пользователю. Если 1 товар, то шаблон ничего не получит
+                if items.count() > 1:
+                    order.itemnumber = f'+ {items.count() - 1} позиций'
+
+            except:
+                order.first = 'Нет товаров'
+
         return context
 
-class MyOrder(DetailView):
+    def post(self, request, *args, **kwargs):
+        '''Обработка post-запроса на удаление заказа. Пост выполняется из другого view (MyOrder), и обрабатывается тут.
+        Post передает номер заказа на удаление.
+        Этот метод должен что-то вернуть, раз мы его переписываем. Он возвращает render, которому отдает все наобходимое,
+        в том числе контекст, который подготавливается вызовом метода выше.
+        *важно сначала удалить запись, а потом вызвать конструктор контекста, чтобы удаленная запись не попала в конектст.'''
+
+        order_pk = self.request.POST['order-pk']
+        Order.objects.filter(pk=order_pk).delete()
+
+        context = self.get_context_data()
+
+        return render(request, 'shop/account.html', context=context)
+
+
+class MyOrder(CardMixin, DetailView):
     model = Order
     template_name = 'shop/order.html'
     context_object_name = 'order'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        self.get_items_for_exact_order(context['order'], context)
         self.save_items_clean_cart()
 
         return context
 
-    def save_items_clean_cart(self):
-        if self.request.session['cart']:
-            print(self.request.session['cart'])
-            user_name = self.request.user
 
-            for prod, quant in self.request.session['cart'].items():
-                item = ItemsOrdered()
-                item.order = Order.objects.filter(user=user_name, closed=0).last()
-                product = Product.objects.filter(pk=int(prod))[0]
-                item.product = product
-                item.quantity = int(quant)
-                item.save()
 
-            del self.request.session['cart']
 
 
 
@@ -325,7 +344,7 @@ def logout_user(request):
     return redirect('home')
 
 
-class LoginUser (LoginView):
+class LoginUser(LoginView):
     '''Авторизация пользователя'''
     form_class = LoginUserForm  # связанный класс формы
     template_name = 'shop/login.html'

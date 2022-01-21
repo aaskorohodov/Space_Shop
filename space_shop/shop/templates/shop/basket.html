@@ -56,6 +56,7 @@
             </div>
         </div>
     {% endfor %}
+<hr>
 <div class="overall-price">
 
     <div>К оплате:</div>
@@ -70,25 +71,31 @@
     </ul>
 
 </div>
+<hr>
 
-<div class="form-order">
-    <form action="{% url 'basket' %}" method="post">
-        {% csrf_token %}
+    {% if request.user.is_authenticated %}
 
-        <div class="form-error">{{ form.non_field_errors }}</div>
+        <div class="form-order">
+            <form action="{% url 'basket' %}" method="post">
+                {% csrf_token %}
 
-        {% for f in form %}
-            <p><label class="form-label" for="{{ f.id_for_label }}">{{f.label}}: </label>{{ f }}</p>
-            <div class="form-error">{{ f.errors }}</div>
-        {% endfor %}
-            <p><label class="form-label" for="id_delivery">Требуется доставка: </label>
-                <input class="small-input" type="checkbox" name="delivery" id="id_delivery">
-            </p>
-            <div class="form-error"></div>
+                <div class="form-error">{{ form.non_field_errors }}</div>
 
-        <button type="submit">Добавить</button>
-    </form>
-</div>
+                {% for f in form %}
+                    <p><label class="form-label" for="{{ f.id_for_label }}">{{f.label}}: </label>{{ f }}</p>
+                    <div class="form-error">{{ f.errors }}</div>
+                {% endfor %}
+                    <p><label class="form-label" for="id_delivery">Требуется доставка: </label>
+                        <input class="small-input" type="checkbox" name="delivery" id="id_delivery">
+                    </p>
+                    <div class="form-error"></div>
+
+                <button type="submit">Добавить</button>
+            </form>
+        </div>
+    {% else %}
+        <p>Авторизуйтесь, чтобы оформить заказ</p>
+    {% endif %}
 
 {% else %}
 <p>Ваша корзина пуста!</p>

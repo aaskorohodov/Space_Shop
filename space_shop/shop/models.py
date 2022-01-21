@@ -77,16 +77,24 @@ class Order(models.Model):
     paid = models.BooleanField(default=False, verbose_name='оплата')
     delivery = models.BooleanField(default=False, verbose_name='Требуется доставка')
     closed = models.BooleanField(default=False, verbose_name='Заказ закрыт')
+    canceled = models.BooleanField(default=False, verbose_name='Заказ отменен')
+    time_create = models.DateTimeField(auto_now_add=True, unique=False, null=True, blank=True, verbose_name='Время создания')
 
     def get_absolute_url(self):
         return reverse('orders', kwargs={'name': self.user, 'pk': self.pk})
 
     def save(self, *args, **kwargs):
-        print('asdasdddddd')
+        print('Дополнительная логика при сохранении')
         super(Order, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f'Заказ №{self.pk}'
 
 
 class ItemsOrdered(models.Model):
     order = models.ForeignKey('Order', on_delete=models.PROTECT, null=True, blank=True, verbose_name='Заказ')
     product = models.ForeignKey('Product', on_delete=models.PROTECT, verbose_name='Товар')
     quantity = models.PositiveIntegerField(default=1, verbose_name='Количество')
+
+    def __str__(self):
+        return f'Товары для заказа {self.order.pk}'
