@@ -47,23 +47,47 @@
 
 
 <!-- Sidebar слева -->
+{% if cats %}
 	<td valign="top" class="left-chapters">
-	<ul id="leftchapters">
+		<ul id="leftchapters">
 
-		{% for c in cats %}
-			{% if c.slug == cat_selected %}
-				<li class="selected"><a href="{{ c.get_absolute_url }}">🚀 {{c.name}}</a></li>
-			{% else %}
-				<li><a href="{{ c.get_absolute_url }}">{{c.name}}</a></li>
-			{% endif %}
-		{% endfor %}
+			{% for c in cats %}
+				{% if c.slug == cat_selected %}
+					<li class="selected"><a href="{{ c.get_absolute_url }}">🚀 {{c.name}}</a></li>
+				{% else %}
+					<li><a href="{{ c.get_absolute_url }}">{{c.name}}</a></li>
+				{% endif %}
+			{% endfor %}
 
-		<li class="share">
-			<p>Наш канал</p>
-			<a class="share-yt" href="https://www.youtube.com/c/KerbalSpaceProgramOfficial" target="_blank" rel="nofollow"></a>
-		</li>
-	</ul>
-</td>
+			<li class="share">
+				<p>Наш канал</p>
+				<a class="share-yt" href="https://www.youtube.com/c/KerbalSpaceProgramOfficial" target="_blank" rel="nofollow"></a>
+			</li>
+		</ul>
+	</td>
+{% endif %}
+
+{% if basket_menu %}
+	<td valign="top" class="left-chapters">
+		<ul id="leftchapters">
+
+			{% for cat, cat_url_name in basket_menu.items %}
+				{% if cat == cat_selected %}
+					<li class="selected">🚀 {{cat}}</li>
+				{% else %}
+					<li><a href="{% url cat_url_name user.username %}">{{cat}}</a></li>
+				{% endif %}
+			{% endfor %}
+
+			<li class="share">
+				<p>Наш канал</p>
+				<a class="share-yt" href="https://www.youtube.com/c/KerbalSpaceProgramOfficial" target="_blank" rel="nofollow"></a>
+			</li>
+		</ul>
+	</td>
+{% endif %}
+
+
 <!-- Конец Sidebar'а -->
 <td valign="top" class="content">
 

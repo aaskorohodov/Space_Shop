@@ -12,9 +12,9 @@ urlpatterns = [
     path('basket', Basket.as_view(), name='basket'),
     path('basket/<int:someint>', Basket.as_view(), name='basket'),
     path('account/<slug:name>/', Account.as_view(), name='account'),
-    path('account/<slug:name>/order<int:pk>', MyOrder.as_view(), name='orders')
+    path('account/<slug:name>/order<int:pk>', MyOrder.as_view(), name='orders'),
+    path('account/<slug:name>/canceled', CanceledOrders.as_view(), name='canceled'),
 ]
-
 
 # пользователи
 urlpatterns += [

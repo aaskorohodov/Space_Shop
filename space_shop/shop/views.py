@@ -263,18 +263,19 @@ class Basket(CardMixin, CreateView):
         return super().form_valid(form)
 
 
-class Account(TemplateView):
+class Account(CardMixin, TemplateView):
     template_name = 'shop/account.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # Готовит левое меню для раздела аккаунт, кладет в контекст. Ждет выбранный пункт в меню (Мои заказы)
+        self.get_left_menu('Мои заказы', context)
+
         # Готовим открытые и закрытые заказы, на основе user_name
         user_name = self.request.user
         activ_orders = Order.objects.filter(user=user_name, closed=0)
-        closed_orders = Order.objects.filter(user=user_name, closed=1)
         context['activ_orders'] = activ_orders
-        context['closed_orders'] = closed_orders
 
         # Готовим товары для заказов (это другая модель) и кладем в контекст
         for order in context['activ_orders']:
@@ -300,11 +301,42 @@ class Account(TemplateView):
         *важно сначала удалить запись, а потом вызвать конструктор контекста, чтобы удаленная запись не попала в конектст.'''
 
         order_pk = self.request.POST['order-pk']
-        Order.objects.filter(pk=order_pk).delete()
+        del_order = Order.objects.get(pk=order_pk)
+        del_order.closed = True
+        del_order.save()
 
         context = self.get_context_data()
 
         return render(request, 'shop/account.html', context=context)
+
+
+class CanceledOrders(CardMixin, ListView):
+    template_name = 'shop/account.html'
+    model = Order
+    context_object_name = 'closed_orders'
+
+    def get_queryset(self):
+        user_name = self.request.user
+        return Order.objects.filter(user=user_name, closed=1)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        self.get_left_menu('Отмененные заказы', context)
+
+        for order in context['closed_orders']:
+            items = ItemsOrdered.objects.filter(order=order.pk)
+
+            try:
+                order.first = items[0]
+                # Считаем количество товаров, чтобы показать пользователю. Если 1 товар, то шаблон ничего не получит
+                if items.count() > 1:
+                    order.itemnumber = f'+ {items.count() - 1} позиций'
+
+            except:
+                order.first = 'Нет товаров'
+
+        return context
 
 
 class MyOrder(CardMixin, DetailView):
@@ -312,13 +344,38 @@ class MyOrder(CardMixin, DetailView):
     template_name = 'shop/order.html'
     context_object_name = 'order'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        print(context['order'])
         self.get_items_for_exact_order(context['order'], context)
         self.save_items_clean_cart()
 
         return context
+
+    def post(self, request, *args, **kwargs):
+        """
+        *Метод post вызывается только если отправить форму (изменить данные заказа)
+        Изменяет комментарий к заказу. При обычной работе, метод get_context_data (в django, а не кастомный), получает
+        объект (поскольку это DetailView, то объект = конкретная запись из БД, а не queryset). Чтение записи делается
+        другим методом (вроде get_object), который вызывается методом get (вероятно). Тут же мы обрабатываем post,
+        который сами и написали, следовательно, get_object не вызывается, get_context не получает свой объект, не может
+        записать его в context['object'], вываливается ошибка. Объект записывается как атрибут класса self.object,
+        откуда get_context и пытается получить свой объект. Устраняем ошибку, вручную получая объект."""
+
+        order = Order.objects.get(pk=kwargs['pk'])
+        self.object = order
+
+        # Записываем новый комментарий, который нам дает форма по ключу comment-remade
+        new_comment = self.request.POST['comment-remade']
+        order.order_comment = new_comment
+        order.save()
+
+        # Зовем конструктор контекста
+        context = self.get_context_data()
+
+        # Вручную вызываем рендер, передаем ему все нужное, в том числе контекст
+        return render(request, 'shop/order.html', context=context)
 
 
 

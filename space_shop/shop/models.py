@@ -97,4 +97,4 @@ class ItemsOrdered(models.Model):
     quantity = models.PositiveIntegerField(default=1, verbose_name='Количество')
 
     def __str__(self):
-        return f'Товары для заказа {self.order.pk}'
+        return f'{self.product} {self.quantity}шт для заказа №{self.order.pk}'

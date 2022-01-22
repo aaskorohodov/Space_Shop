@@ -1,7 +1,16 @@
 from .models import *
 
 
+basket_menu = {'Мои заказы': 'account', 'Отмененные заказы': 'canceled'}
+
+
 class CardMixin:
+    def get_left_menu(self, cat_selected, context):
+        '''Рисует левое меню для раздела аккаунт. Передает шаблону Base, который сравнивает ключ в basket_menu с переданным
+        cat_selected, чтобы нарисовать выбранный пункт и другие пункты.'''
+        context['basket_menu'] = basket_menu
+        context['cat_selected'] = cat_selected
+
     def make_cart(self, post):
         product_id = post['prod']
         quantity = post['quantity']

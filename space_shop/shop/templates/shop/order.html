@@ -4,6 +4,8 @@
 
 <h2>Заказ {{order.pk}}</h2>
 
+
+<!--Таблица с товарами-->
 <table class="order-exact">
 
     <tr>
@@ -18,12 +20,26 @@
     </tr>
     {% endfor %}
 </table>
+<!--конец таблицы с товарами-->
 
+
+<!--Изменить комментарий-->
+<p>Комментарий к заказу:</p>
+<form action="" method="post">
+    {% csrf_token %}
+    <textarea name="comment-remade" style="width: 614px; height: 182px;">{{order.order_comment}}</textarea>
+    <button class="glow-button" type="submit">Изменить комментарий</button>
+</form>
+<!--Конец изменения комментария-->
+
+
+<!--Кнопка отмены заказа-->
 <form action="{% url 'account' user.username %}" method="post">
     {% csrf_token %}
     <input type="hidden" name="order-cancel" value="yes">
     <input type="hidden" name="order-pk" value="{{order.pk}}">
     <button class="glow-button" type="submit">Отменить этот заказ</button>
 </form>
+<!--Конец кнопки отмены заказа-->
 
 {% endblock %}
