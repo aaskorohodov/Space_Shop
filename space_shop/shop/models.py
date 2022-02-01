@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 
@@ -98,3 +99,8 @@ class ItemsOrdered(models.Model):
 
     def __str__(self):
         return f'{self.product} {self.quantity}шт для заказа №{self.order.pk}'
+
+
+class UserExtra(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    user_photo = models.ImageField(upload_to="photos/users", blank=True, null=True, verbose_name='Фото пользователя')

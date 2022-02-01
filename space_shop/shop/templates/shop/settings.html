@@ -1,0 +1,12 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="hidden" name="user" value="{{user.username}}" required="" id="user">
+    <button type="submit">Готово</button>
+</form>
+
+{% endblock %}

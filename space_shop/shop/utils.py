@@ -1,7 +1,11 @@
 from .models import *
 
 
-basket_menu = {'Мои заказы': 'account', 'Отмененные заказы': 'canceled'}
+basket_menu = {'Мои заказы': 'account',
+               'Отмененные заказы': 'canceled',
+               'Изменить пароль': 'password_change',
+               'Настройки': 'settings'
+               }
 
 
 class CardMixin:

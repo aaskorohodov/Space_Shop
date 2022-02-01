@@ -1,3 +1,4 @@
+from django.contrib.auth import views
 from django.urls import path
 
 from .views import *
@@ -14,6 +15,9 @@ urlpatterns = [
     path('account/<slug:name>/', Account.as_view(), name='account'),
     path('account/<slug:name>/order<int:pk>', MyOrder.as_view(), name='orders'),
     path('account/<slug:name>/canceled', CanceledOrders.as_view(), name='canceled'),
+    path('account/<slug:name>/password-change', ChangePass.as_view(), name='password_change'),
+    path('contact/', Contact.as_view(), name='contact'),
+    path('account/<slug:name>/settings', Settings.as_view(), name='settings')
 ]
 
 # пользователи

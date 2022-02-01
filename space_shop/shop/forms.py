@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User, AbstractUser
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.http import request
+from django.core.exceptions import ValidationError
 
 from .models import *
 
@@ -42,3 +42,17 @@ class MakeOrder(forms.ModelForm):
     class Meta:
         model = Order
         exclude = ['paid', 'delivery', 'user', 'canceled', 'closed']
+
+
+class ChangePass(forms.Form):
+    old_password = forms.CharField(label='Старый пароль', widget=forms.PasswordInput())
+    new_password = forms.CharField(label='Новый пароль', widget=forms.PasswordInput())
+    new_password2 = forms.CharField(label='Повтор пароля', widget=forms.PasswordInput())
+
+
+class AddUserPhoto(forms.ModelForm):
+    class Meta:
+        model = UserExtra
+        fields = ['user_photo']
+
+

@@ -857,3 +857,16 @@ ul.lang-list li a:hover {color: #fdc073;}
 .order-exact img {
     outline: 0px solid #000;
 }
+
+.error {
+    color: red;
+}
+
+.pass-form label {
+    display: inline-block;
+    min-width: 150px;
+}
+
+.map {
+    text-align:center;
+}

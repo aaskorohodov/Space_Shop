@@ -1,10 +1,12 @@
-from django.contrib.auth import login, logout
+from django.contrib import auth
+from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, TemplateView
-from django.views.generic.edit import FormMixin
+from django.views.generic.edit import FormMixin, FormView
+from django.contrib.auth.models import User
 
 from .forms import *
 from .models import *
@@ -378,13 +380,115 @@ class MyOrder(CardMixin, DetailView):
         return render(request, 'shop/order.html', context=context)
 
 
+class ChangePass(CardMixin, FormView):
+    """Занимается сменой пароля. При первом вызове (переход в смену пароля) пропускает метод post, при попутке смены
+    пароля, метод post отрабатывает, так как форма переадресует запрос на тот же УРЛ."""
+    form_class = ChangePass
+    template_name = 'shop/password_change.html'
+
+    def get_context_data(self, old_pass_error=None, new_pass_error=None, done=None, *args, **kwargs):
+        """Переменные error и done передает метод post (он ниже). Если он их передал, значит при обработке формы
+        случилась ошибка. Тогда эти переменные будут сложены в контекст."""
+        context = super().get_context_data(**kwargs)
+
+        # Готовит левое меню для раздела аккаунт, кладет в контекст. Ждет выбранный пункт в меню (Мои заказы)
+        self.get_left_menu('Изменить пароль', context)
+
+        '''Ниже готовится форма, которая будет передана в шаблон в контексте. Форма вызывается обращением
+        к атрибуту form_class, который был задан первой строчкой в этом классе. Это единственный известный мне способ
+        вызвать форму таким образом, положить ее в контекст и отрисовать в шаблоне стандартным способом.'''
+        form = self.form_class()
+        context['form'] = form
+
+        if old_pass_error is not None:
+            context['old_pass_error'] = old_pass_error
+
+        if new_pass_error is not None:
+            context['new_pass_error'] = new_pass_error
+
+        if done is not None:
+            context['done'] = done
+
+        return context
+
+
+    def post(self, request, *args, **kwargs):
+        """Включается, только если была отправлена форма. Проверяет верно ли введен старый пароль и совпадают ли новые.
+        Затем меняет пароль. Проверка на старый пароль происходит попыткой авторизовать пользователя предоставленным
+        паролем. Если авторизация не прошла (неверный пароль), то authenticate() вернет None."""
+
+        old_password = self.request.POST['old_password']
+        new_password = self.request.POST['new_password']
+        new_password2 = self.request.POST['new_password2']
+        current_user = self.request.POST['user']
+
+        user = authenticate(username=current_user, password=old_password)
+
+        if user is None and new_password != new_password2:
+            context = self.get_context_data(old_pass_error='Старый пароль введен неверно',
+                                            new_pass_error='Поля нового пароля не совпадают')
+
+        elif user is None:
+            context = self.get_context_data(old_pass_error='Старый пароль введен неверно')
+
+        elif new_password != new_password2:
+            context = self.get_context_data(new_pass_error='Поля нового пароля не совпадают')
+
+
+        if user is not None and new_password == new_password2:
+            context = self.get_context_data(done='Готово!')
+
+            u = User.objects.get(username=current_user)
+            u.set_password(new_password)
+            u.save()
+
+        return render(request, 'shop/password_change.html', context)
+
+
+class Contact(TemplateView):
+    template_name = 'shop/contact.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        cats = Category.objects.all()
+        context['cats'] = cats
+
+        return context
+
+class Settings(CardMixin, FormView):
+    template_name = 'shop/settings.html'
+    form_class = AddUserPhoto
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        self.get_left_menu('Настройки', context)
+
+        form = self.form_class()
+        context['form'] = form
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        print(self.request.POST)
+
+        user = User.objects.filter(username=self.request.POST['user'])
+        user_pk = user[0].pk
+
+        user_photo = UserExtra()
+        user_photo.user_photo = self.request.POST['user_photo']
+
+        context = self.get_context_data()
+
+        return render(request, 'shop/settings.html', context)
 
 
 
 
 class RegisterUser(CreateView):
     '''Регистрация нового пользователя'''
-    form_class = RegisterUserForm  # связанный класс формы
+    form_class = RegisterUserForm
     template_name = 'shop/register.html'
     success_url = reverse_lazy('login')
 
